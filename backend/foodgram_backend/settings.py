@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY',default='token')
+SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
@@ -142,10 +143,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly', 
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 6,
@@ -160,9 +163,4 @@ DJOSER = {
         'user': ['rest_framework.permissions.AllowAny'],
         'user_list': ['rest_framework.permissions.AllowAny'],
     },
-}
-
-DEFAULT_AUTHENTICATION_CLASSES: {
-    'rest_framework.authentication.SessionAuthentication',
-    'rest_framework.authentication.BasicAuthentication'
 }
