@@ -1,6 +1,5 @@
-from django.db import models
 from django.core.validators import MinValueValidator
-
+from django.db import models
 from users.models import User
 
 
@@ -56,7 +55,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         upload_to='media/',
         default=None
-        )
+    )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
@@ -97,7 +96,7 @@ class IngredientRecipe(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         related_name='ingredient_recipe'
-        )
+    )
     amount = models.IntegerField(default=1)
 
     class Meta:

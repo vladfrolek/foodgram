@@ -2,19 +2,18 @@ from datetime import datetime
 
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import (
-    SAFE_METHODS,
+    AllowAny,
     IsAuthenticated,
-    AllowAny
+    SAFE_METHODS,
 )
-
+from rest_framework import viewsets, status
 from recipes.models import (
     Recipe,
     Tag,
@@ -73,15 +72,13 @@ class RecipeViewset(viewsets.ModelViewSet):
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(
-            methods=['POST', 'DELETE'],
+    @action(methods=['POST', 'DELETE'],
             detail=True,
-            serializer_class=FavoriteSerializer
-    )
+            serializer_class=FavoriteSerializer)
     def favorite(self, request, pk):
         favorite_obj = Favorite.objects.filter(
-                user_id=request.user.id,
-                recipe_id=pk).exists()
+            user_id=request.user.id,
+            recipe_id=pk).exists()
         if request.method == 'POST':
             if not favorite_obj:
                 return self.add_obj(request, pk, self.serializer_class)
@@ -95,15 +92,14 @@ class RecipeViewset(viewsets.ModelViewSet):
                 {"detail": "Рецепт уже был удален из избранного"},
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @action(
-            methods=['POST', 'DELETE'],
+    @action(methods=['POST', 'DELETE'],
             detail=True,
-            serializer_class=ShoppingCartSerializer
-    )
+            serializer_class=ShoppingCartSerializer)
     def shopping_cart(self, request, pk):
         shopping_cart_obj = ShoppingCart.objects.filter(
-                user_id=request.user.id,
-                recipe_id=pk).exists()
+            user_id=request.user.id,
+            recipe_id=pk
+        ).exists()
         if request.method == 'POST':
             if not shopping_cart_obj:
                 return self.add_obj(request, pk, self.serializer_class)
