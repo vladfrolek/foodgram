@@ -100,8 +100,8 @@ class IngredientRecipe(models.Model):
     amount = models.IntegerField(default=1)
 
     class Meta:
-        verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Ингредиенты'
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецепте '
 
     def __str__(self):
         return self.name

@@ -61,5 +61,5 @@ class Subscribe(models.Model):
                 name='unique_follow',
             )
         )
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+        verbose_name = 'Подписка пользователей'
+        verbose_name_plural = 'Подписка пользователей'
