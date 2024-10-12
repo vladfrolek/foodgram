@@ -1,7 +1,7 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from constants import (
+from .constants import (
     INGREDIENT_MAX_NAME,
     INGREDIENT_MAX_MEASURE_UNIT,
     RECIPE_MAX_NAME,
