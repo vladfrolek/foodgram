@@ -7,7 +7,7 @@ from .constants import (
     RECIPE_MAX_NAME,
     TAG_MAX_LENGHT,
 )
-from .core import FavoriteAndShoppingCartModel
+
 from users.models import User
 
 
@@ -120,10 +120,29 @@ class IngredientRecipe(models.Model):
         return self.name
 
 
+class FavoriteAndShoppingCartModel(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        abstract = True
+
+
 class Favorite(FavoriteAndShoppingCartModel):
 
     class Meta(FavoriteAndShoppingCartModel.Meta):
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'user'),
+                name='unique_favorite'
+            )
+        ]
         default_related_name = 'favorites'
         verbose_name = 'Избранное'
 
@@ -131,6 +150,11 @@ class Favorite(FavoriteAndShoppingCartModel):
 class ShoppingCart(FavoriteAndShoppingCartModel):
 
     class Meta(FavoriteAndShoppingCartModel.Meta):
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'user'),
+                name='unique_shopping_cart'
+            )
+        ]
         default_related_name = 'shopping_cart'
         verbose_name = 'Корзина'
