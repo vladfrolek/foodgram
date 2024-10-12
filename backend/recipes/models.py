@@ -7,7 +7,6 @@ from .constants import (
     RECIPE_MAX_NAME,
     TAG_MAX_LENGHT,
 )
-
 from users.models import User
 
 
