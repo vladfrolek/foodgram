@@ -1,21 +1,35 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
+from constants import (
+    INGREDIENT_MAX_NAME,
+    INGREDIENT_MAX_MEASURE_UNIT,
+    RECIPE_MAX_NAME,
+    TAG_MAX_LENGHT,
+)
+from .core import FavoriteAndShoppingCartModel
 from users.models import User
 
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=128,
+        max_length=INGREDIENT_MAX_NAME,
         verbose_name='Название'
     )
     measurement_unit = models.CharField(
-        max_length=64,
+        max_length=INGREDIENT_MAX_MEASURE_UNIT,
         verbose_name='Единица измерения'
     )
 
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name', 'measurement_unit'),
+                name='ingredients_unique'
+            )
+        ]
 
     def __str__(self):
         return self.name
@@ -23,12 +37,12 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(
-        max_length=32,
+        max_length=TAG_MAX_LENGHT,
         verbose_name='Название'
     )
     slug = models.SlugField(
         null=True,
-        max_length=32,
+        max_length=TAG_MAX_LENGHT,
         unique=True,
         verbose_name='слаг'
     )
@@ -49,7 +63,7 @@ class Recipe(models.Model):
         related_name='recipes'
     )
     name = models.CharField(
-        max_length=128,
+        max_length=RECIPE_MAX_NAME,
         verbose_name='Название'
     )
     image = models.ImageField(
@@ -57,8 +71,7 @@ class Recipe(models.Model):
         default=None
     )
     ingredients = models.ManyToManyField(
-        Ingredient,
-        through='IngredientRecipe',
+        'IngredientRecipe',
         related_name='recipes',
         verbose_name='Ингредиенты в рецепте'
     )
@@ -95,7 +108,7 @@ class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredient_recipe'
+        related_name='+'
     )
     amount = models.IntegerField(default=1)
 
@@ -107,27 +120,17 @@ class IngredientRecipe(models.Model):
         return self.name
 
 
-class Favorite(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='favorites'
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='favorites'
-    )
+class Favorite(FavoriteAndShoppingCartModel):
+
+    class Meta(FavoriteAndShoppingCartModel.Meta):
+
+        default_related_name = 'favorites'
+        verbose_name = 'Избранное'
 
 
-class ShoppingCart(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='shopping_cart'
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='shopping_cart'
-    )
+class ShoppingCart(FavoriteAndShoppingCartModel):
+
+    class Meta(FavoriteAndShoppingCartModel.Meta):
+
+        default_related_name = 'shopping_cart'
+        verbose_name = 'Корзина'

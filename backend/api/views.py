@@ -7,6 +7,7 @@ from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.permissions import (
     AllowAny,
@@ -32,11 +33,11 @@ from .serializers import (
     IngredientSerializer,
     ShoppingCartSerializer,
     SubscribeSerializer,
-    CustomUserSerializer,
+    UserSerializer,
     AvatarSerializer,
     FavoriteSerializer
 )
-from .filters import RecipeFilter, IngredientFilter
+from .filters import RecipeFilter
 
 
 class RecipeViewset(viewsets.ModelViewSet):
@@ -45,9 +46,6 @@ class RecipeViewset(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     model = Recipe
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -164,15 +162,14 @@ class TagViewset(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewset(viewsets.ReadOnlyModelViewSet):
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = IngredientFilter
+    filter_backends = (SearchFilter,)
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
 
 
-class CustomUserViewSet(UserViewSet):
-    serializer_class = CustomUserSerializer
+class UserViewSet(UserViewSet):
+    serializer_class = UserSerializer
     queryset = User.objects.all()
 
     def get_permissions(self):
