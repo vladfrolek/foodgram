@@ -1,4 +1,3 @@
-from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, status
@@ -51,9 +50,31 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
 
 
+class IngredientRecipeSerizlizer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    measurement_unit = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'amount',
+            'measurement_unit'
+        )
+        model = IngredientRecipe
+
+    def get_measurement_unit(self, obj):
+        measurement_unit = obj.ingredient.measurement_unit
+        return measurement_unit
+
+    def get_name(self, obj):
+        name = obj.ingredient.name
+        return name
+
+
 class RecipeReadSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    ingredients = serializers.SerializerMethodField()
+    ingredients = IngredientRecipeSerizlizer(many=True)
     tags = TagSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -74,19 +95,9 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
-    def get_ingredients(self, obj):
-        recipe = obj
-        ingredients = recipe.ingredients.values(
-            'id',
-            'name',
-            'measurement_unit',
-            amount=F('ingredient_recipe__amount')
-        )
-        return ingredients
-
     def get_is_favorited(self, obj):
-        user_id = self.context['request'].user.id
-        user = User.objects.get(id=user_id)
+        user = self.context.get('request').user
+        user_id = user.id
         recipe_id = obj.id
         if user.is_anonymous:
             return False
@@ -170,9 +181,11 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
+        request = self.context['request']
+        user = request.user
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
+        recipe = Recipe.objects.create(**validated_data, author=user)
         recipe.tags.set(tags)
         self.create_ingredients_amounts(recipe=recipe, ingredients=ingredients)
         return recipe
@@ -183,7 +196,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         instance.tags.clear()
         instance.tags.set(tags)
-        instance.ingredients.clear()
+        instance.ingredients.all().delete()
         self.create_ingredients_amounts(
             recipe=instance,
             ingredients=ingredients)

@@ -1,13 +1,14 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from users.models import User
+
 from .constants import (
     INGREDIENT_MAX_NAME,
     INGREDIENT_MAX_MEASURE_UNIT,
     RECIPE_MAX_NAME,
     TAG_MAX_LENGHT,
 )
-from users.models import User
 
 
 class Ingredient(models.Model):
@@ -66,8 +67,7 @@ class Recipe(models.Model):
         verbose_name='Название'
     )
     image = models.ImageField(
-        upload_to='media/',
-        default=None
+        upload_to='media/'
     )
     text = models.TextField(
         verbose_name='Текстовое описание'
@@ -109,9 +109,6 @@ class IngredientRecipe(models.Model):
     class Meta:
         verbose_name = 'Ингредиент в рецепте'
         verbose_name_plural = 'Ингредиенты в рецепте '
-
-    def __str__(self):
-        return self.name
 
 
 class FavoriteAndShoppingCartModel(models.Model):
