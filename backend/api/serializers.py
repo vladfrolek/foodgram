@@ -13,7 +13,7 @@ from recipes.models import (
     ShoppingCart,
     IngredientRecipe
 )
-from users.models import User, Subscribe
+from users.models import Subscribe, User
 
 
 class UserSerializer(serializers.ModelSerializer):
