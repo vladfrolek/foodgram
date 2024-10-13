@@ -69,11 +69,6 @@ class Recipe(models.Model):
         upload_to='media/',
         default=None
     )
-    ingredients = models.ManyToManyField(
-        'IngredientRecipe',
-        related_name='recipes',
-        verbose_name='Ингредиенты в рецепте'
-    )
     text = models.TextField(
         verbose_name='Текстовое описание'
     )
@@ -102,7 +97,7 @@ class IngredientRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingredient_recipe'
+        related_name='ingredients'
     )
     ingredient = models.ForeignKey(
         Ingredient,
@@ -131,17 +126,17 @@ class FavoriteAndShoppingCartModel(models.Model):
 
     class Meta:
         abstract = True
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'user'),
+                name="%(class)s_unique'"
+            )
+        ]
 
 
 class Favorite(FavoriteAndShoppingCartModel):
 
     class Meta(FavoriteAndShoppingCartModel.Meta):
-        constraints = [
-            models.UniqueConstraint(
-                fields=('recipe', 'user'),
-                name='unique_favorite'
-            )
-        ]
         default_related_name = 'favorites'
         verbose_name = 'Избранное'
 
@@ -149,11 +144,5 @@ class Favorite(FavoriteAndShoppingCartModel):
 class ShoppingCart(FavoriteAndShoppingCartModel):
 
     class Meta(FavoriteAndShoppingCartModel.Meta):
-        constraints = [
-            models.UniqueConstraint(
-                fields=('recipe', 'user'),
-                name='unique_shopping_cart'
-            )
-        ]
         default_related_name = 'shopping_cart'
         verbose_name = 'Корзина'
