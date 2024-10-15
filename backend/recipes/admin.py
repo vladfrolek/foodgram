@@ -24,6 +24,10 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
     )
 
 
+class IngredientsInline(admin.TabularInline):
+    model = IngredientRecipe
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
 
@@ -35,14 +39,8 @@ class RecipeAdmin(admin.ModelAdmin):
             tag_str += ', ' + tag.name
         return tag_str.lstrip(', ')
 
-    def get_ingredients(self, object):
-        """Получает тег или список тегов рецепта."""
-        ingredient_list = object.ingredients.get_queryset()
-        ingredient_str = ''
-        for ingredient in ingredient_list:
-            ingredient_str += ', ' + ingredient.name
-        return ingredient_str.lstrip(', ')
     get_tag.short_description = 'Теги'
+    inlines = [IngredientsInline,]
     list_display = (
         'author',
         'name',

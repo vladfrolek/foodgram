@@ -162,7 +162,8 @@ class TagViewset(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewset(viewsets.ReadOnlyModelViewSet):
-    filter_backends = (SearchFilter,)
+    filter_backends = [SearchFilter]
+    search_filter = ['name']
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
