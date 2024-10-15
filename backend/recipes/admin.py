@@ -3,7 +3,6 @@ from django.contrib import admin
 from .models import (
     Tag,
     Recipe,
-    Ingredient,
     IngredientRecipe
 )
 
@@ -35,6 +34,7 @@ class RecipeAdmin(admin.ModelAdmin):
         for tag in tag_list:
             tag_str += ', ' + tag.name
         return tag_str.lstrip(', ')
+
     def get_ingredients(self, object):
         """Получает тег или список тегов рецепта."""
         ingredient_list = object.ingredients.get_queryset()
@@ -51,7 +51,6 @@ class RecipeAdmin(admin.ModelAdmin):
     filter_horizontal = ('tags',)
     search_fields = ('name', 'author__username',)
     list_filter = ('tags',)
-
 
 
 admin.site.empty_value_display = 'значение отсутствует'
