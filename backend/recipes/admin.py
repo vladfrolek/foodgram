@@ -42,7 +42,7 @@ class RecipeAdmin(admin.ModelAdmin):
         return tag_str.lstrip(', ')
 
     get_tag.short_description = 'Теги'
-    inlines = [IngredientsInline,]
+    inlines = [IngredientsInline, ]
     list_display = (
         'author',
         'name',
