@@ -27,6 +27,12 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 class IngredientsInline(admin.TabularInline):
     model = IngredientRecipe
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset.form.base_fields['name'].required = True
+        formset.form.base_fields['amount'].required = True
+        return formset
+
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
